@@ -1,17 +1,22 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-install_path="/opt/firefox-nightly/"
+install_path="/usr/lib"
 
 arch=`uname -m`
 case $arch in
-    "x86_64")   ;;
-    "i686")             ;;
-    *)  echo "Sorry, no firefox build available for $arch"; exit;;
+    "x86_64")
+        Message="x86_64 (64 bit) selected"
+        ;;
+    "i686")
+        Message="i686 (32 bit) selected"
+        ;;
+    *)  Message="Sorry, no firefox build available for $arch"; exit
+        ;;
 esac
-
+echo $Message
 echo "Searching for nightly packages for Linux $arch..."
 
-result=`curl -s http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-trunk/ | grep "$arch\.tar\.bz2</a>" | tail -n1`
+result=`curl -s https://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-trunk/ | grep "$arch\.tar\.bz2</a>" | tail -n1`
 
 package="`echo "$result" | perl -ne 'm/<a .*?>(.*?)<\/a>/; print "$1\n"'`"
 date="`echo "$result"    | perl -ne 'm/<a .*?>.*?<\/a><\/td><.*?>(.*?)\s+<\/td>/; print "$1\n"' | sed -r 's/\s/-/g'`"
@@ -39,7 +44,7 @@ mkdir -p "$install_path/firefox-nightly" || exit
 cd "$install_path/firefox-nightly"
 
 echo "Dowloading $package to $install_path"
-curl "http://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-trunk/$package" -o "$package" || exit
+curl "https://ftp.mozilla.org/pub/mozilla.org/firefox/nightly/latest-trunk/$package" -o "$package" || exit
 
 echo
 echo "Unpacking $package"
